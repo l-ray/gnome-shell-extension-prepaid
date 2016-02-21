@@ -1,0 +1,16 @@
+.pp-box-layout {
+	width: 200px;
+}
+.pp-label {
+	/*text-align: right;*/
+	width:120px;
+}
+
+.pp-value {
+	text-align: right;
+	width:40px;
+}
+
+.pp-unit-label {
+	padding: 0px 2px 0px 2px;
+}

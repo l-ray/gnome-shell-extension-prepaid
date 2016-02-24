@@ -15,6 +15,7 @@ const SipgateProvider = new Lang.Class({
     _login: String(),
     _password: String(), 
 
+
     /*
      *  Initialize the instance of SipgateProvider class
      *  root - root element of feed file
@@ -50,10 +51,7 @@ const SipgateProvider = new Lang.Class({
 		var result = message.response_body.data
                 log(message.response_body.data)    
                 func(
-			result.substr(
-				result.indexOf("TotalIncludingVat</name><value><double>")+39,
-				4
-			)
+			/TotalIncludingVat<\/name><value><double>([0-9]+\.[0-9]{1,2})/.exec(result)[1]			
 		);
                 
             } catch (e) {

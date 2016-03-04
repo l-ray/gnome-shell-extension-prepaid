@@ -16,6 +16,8 @@ const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const Panel = imports.ui.panel;
 
+const Util = imports.misc.util;
+
 const SETTINGS_SCHEMA ='de.l-ray.gnome.shell.extensions.prepaid-overview'
 const ACCOUNTS_KEY = 'accounts';
 
@@ -23,6 +25,7 @@ let panelItemLabel;
 
 const PrepaidMenuItem = new Lang.Class({
     Name: 'PrepaidMenuItem',
+    reactive: false,
     Extends: PopupMenu.PopupBaseMenuItem,
 
     _init: function(title) {
@@ -93,16 +96,47 @@ const PrepaidMenu = new Lang.Class({
 
         },this);
 
+
+        /* adding buttons on bottom of window - START */
+	this._buttonMenu = new PopupMenu.PopupBaseMenuItem({
+            reactive: false,
+            style_class: 'prepaid_overview-menu-button-container'
+        });
+        this.menu.addMenuItem(this._buttonMenu);(this._buttonMenu)
+
+        this._buttonBox1 = new St.BoxLayout({
+            style_class: 'prepaid_overview-button-box'
+        });
+
+
+        this._reloadButton = this.createButton('view-refresh-symbolic', "Reload Account Balances Information");
+        this._reloadButton.connect('clicked', Lang.bind(this, function() {
+            log('RELOAD not yet implemented')
+        }));
+        this._buttonBox1.add_actor(this._reloadButton);
+
+        this._buttonBox2 = new St.BoxLayout({
+            style_class: 'openweather-button-box'
+        });
+
+        this._prefsButton = this.createButton('preferences-system-symbolic', _("Account Settings"));
+   
+        this._prefsButton.connect('clicked', Lang.bind(this, this._onPreferencesActivate));
+        this._buttonBox2.add_actor(this._prefsButton);
+
+        this._buttonMenu.actor.add_actor(this._buttonBox1);
+        this._buttonMenu.actor.add_actor(this._buttonBox2);
+ 
+        /* adding buttons on bottom of window - END */
+
     },
 
     destroy: function() {
         this.parent();
     },
+
   loadConfig: function() {
         this._settings = Convenience.getSettings(SETTINGS_SCHEMA);
-
-        // if (this._cities.length === 0)
-        //    this._cities = "-8.5211767,179.1976747>Vaiaku, Tuvalu>-1";
 
         this._settingsC = this._settings.connect("changed", Lang.bind(this, function() {
         //    this.rebuildButtonMenu();
@@ -114,7 +148,20 @@ const PrepaidMenu = new Lang.Class({
         if (!this._settings)
             this.loadConfig();
         return this._settings.get_string(ACCOUNTS_KEY).split(",");
-    }
+    },
+
+    _onPreferencesActivate: function() {
+        this.menu.actor.hide();
+        Util.spawn(["gnome-shell-extension-prefs", "prepaid_overview@l-ray.de"]);
+        return 0;
+    },
+    createButton: function(iconName, accessibleName) {
+        let button;
+
+        button = Main.panel.statusArea.aggregateMenu._system._createActionButton(iconName, accessibleName);
+
+        return button;
+    },
 });
 
 
@@ -140,3 +187,5 @@ function enable() {
 function disable() {
     _indicator.destroy();
 }
+
+

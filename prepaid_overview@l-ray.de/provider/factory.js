@@ -2,13 +2,6 @@ const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Sipgate = Me.imports.provider.sipgate;
 const TMI = Me.imports.provider.tmi;
 
-// Keep enums in sync with GSettings schemas
-const ProviderTemplate = {
-    DEFAULT: -1,
-    SIPGATE: 'sipgate',
-    TESCO_MOBILE_IE: 'tesco-mobile-ie'
-};
-
 /*
  *  Factory function that initialize correct parser class instance
  */
@@ -19,11 +12,11 @@ function getInstance(credential) {
  
 	log("searching type: |"+cDto.instanceName+"|")
 
-	if (cDto.instanceName == ProviderTemplate.SIPGATE) {
+	if (cDto.instanceName == "SIPGATE") {
 		return new Sipgate.SipgateProvider(cDto.login, cDto.password, cDto.label);	
 	}
 
-	if (cDto.instanceName == ProviderTemplate.TESCO_MOBILE_IE) {
+	if (cDto.instanceName == "TESCO_MOBILE_IE") {
 		return new TMI.TMIProvider(cDto.login, cDto.password, cDto.label);	
 	}
 

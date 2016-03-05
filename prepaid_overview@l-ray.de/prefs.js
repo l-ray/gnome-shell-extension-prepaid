@@ -22,9 +22,9 @@ const ACCOUNTS_KEY = 'accounts'
 
 // Keep enums in sync with GSettings schemas
 const ProviderTemplate = {
-    DEFAULT: -1,
-    SIPGATE: 'sipgate',
-    TESCO_MOBILE_IE: 'tesco-mobile-ie'
+    // DEFAULT: -1,
+    SIPGATE: 0,
+    TESCO_MOBILE_IE: 1
 };
 
 let _httpSession;
@@ -371,11 +371,11 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
     },
 
     calculateActiveCombo: function(s) {
-	switch (s) {
-		case ProviderTemplate.SIPGATE: return 0;
-		case ProviderTemplate.TESCO_MOBILE_IE: return 1;
-		default: return -1;
-	}
+	var activeCombo = ProviderTemplate[s]
+        
+        if (activeCombo == undefined) return -1
+
+        return activeCombo
     },
 
     /*
@@ -407,7 +407,7 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
 		label: this.editName.get_text(),
 	 	login: this.editLogin.get_text(),
         	password: this.editPassword.get_text(),
-		instanceName: this.editCombo.get_active()==0?ProviderTemplate.SIPGATE:ProviderTemplate.TESCO_MOBILE_IE
+		instanceName: Object.getOwnPropertyNames(ProviderTemplate)[this.editCombo.get_active()]
 	});
 
         if (theCity.length > 1)

@@ -6,13 +6,6 @@ const GnomeKeyring = imports.gi.GnomeKeyring;
 
 const Mainloop = imports.mainloop;
 
-// Keep enums in sync with GSettings schemas
-const ProviderTemplate = {
-    DEFAULT: -1,
-    SIPGATE: 'sipgate',
-    TESCO_MOBILE_IE: 'tesco-mobile-ie'
-};
-
 /*
  *  Factory function that initialize correct parser class instance
  */
@@ -23,13 +16,13 @@ function getInstance(credential) {
  
 	log("searching type: |"+cDto.instanceName+"|")
 
-	if (cDto.instanceName == ProviderTemplate.SIPGATE) {
+	if (cDto.instanceName == "SIPGATE") {
 		return new Sipgate.SipgateProvider(cDto.login, cDto.password, cDto.label);	
 	}
 
-	if (cDto.instanceName == ProviderTemplate.TESCO_MOBILE_IE) {
+	if (cDto.instanceName == "TESCO_MOBILE_IE") {
 		return new TMI.TMIProvider(cDto.login, cDto.password, cDto.label);	
-	}h
+	}
 
    }
     catch (e) {
@@ -44,8 +37,7 @@ function getInstance(credential) {
 	var credRegex = /^"(.*?)"<(.*?):(.*?)@@(.*?)>$/g;
 	var credArray = credRegex.exec(credential)
 	log("got credential-array "+credArray);
-	log(retrievePassword(credArray[4],credArray[2]))
-        return {
+	return {
 		label: credArray[1],
 		login: credArray[2],
 		password: credArray[3],
@@ -55,7 +47,6 @@ function getInstance(credential) {
     }
 
     function serializeCredentialString(c){
-        savePassword(c.instanceName,c.login,c.password)
 	return "\""+c.label+"\"<"+c.login+":"+c.password+"@@"+c.instanceName+">"
     }
 

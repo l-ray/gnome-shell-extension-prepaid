@@ -202,14 +202,14 @@
       <!-- column-name login -->
       <column type="gchararray"/>
       <!-- column-name password -->
-      <column type="gchararray"/>
+      <!-- column type="gchararray"/ -->
     </columns>
     <data>
       <row>
         <col id="0">dummy</col>
         <col id="1">dummy</col>
         <col id="2" translatable="yes">dummy</col>
-        <col id="3" translatable="yes">dummy</col>
+        <!-- col id="3" translatable="yes">dummy</col -->
       </row>
     </data>
   </object>

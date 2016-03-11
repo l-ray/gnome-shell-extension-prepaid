@@ -4,13 +4,10 @@ const Gtk = imports.gi.Gtk;
 const GObject = imports.gi.GObject;
 const Gettext = imports.gettext.domain('gnome-shell-extension-prepaid-overview');
 const _ = Gettext.gettext;
-// const Soup = imports.gi.Soup;
 
 const Lang = imports.lang;
-// const Mainloop = imports.mainloop;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
-// const Config = imports.misc.config;
 const Convenience = Me.imports.convenience;
 const Factory = Me.imports.provider.factory;
 
@@ -27,8 +24,6 @@ const ProviderTemplate = {
     TESCO_MOBILE_IE: 1
 };
 
-let _httpSession;
-
 let mCities = null;
 
 let inRealize = false;
@@ -40,7 +35,7 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
     GTypeName: 'PrepaidOverviewExtensionPrefsWidget',
     Extends: Gtk.Box,
 
-    actual_city: 0,
+    actual_account: 0,
 
     _init: function(params) {
         this.parent(params);
@@ -81,7 +76,7 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
         this.liststore = this.Window.get_object("tree-liststore");
         this.editWidget = this.Window.get_object("edit-widget");
         
-	this.editName = this.Window.get_object("edit-name");
+	    this.editName = this.Window.get_object("edit-name");
         this.editLogin = this.Window.get_object("edit-login");
         this.editCombo = this.Window.get_object("edit-combo");
         this.editPassword = this.Window.get_object("edit-password");
@@ -91,14 +86,14 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
         this.editPassword.connect("icon-release", Lang.bind(this, this.clearEntry));
 
         this.Window.get_object("tree-toolbutton-add").connect("clicked", Lang.bind(this, function() {
-		this.city=this.city+","+Factory.serializeCredentialString({label:'',instanceName:'',login:''});
-		this.actual_city = this.city.split(",").length-1;            
-		this.editCity();
+            this.account=this.account+","+Factory.serializeCredentialString({label:'',instanceName:'',login:''});
+            this.actual_account = this.account.split(",").length-1;
+            this.editAccount();
         }));
 
-        this.Window.get_object("tree-toolbutton-remove").connect("clicked", Lang.bind(this, this.removeCity));
+        this.Window.get_object("tree-toolbutton-remove").connect("clicked", Lang.bind(this, this.removeAccount));
 
-        this.Window.get_object("tree-toolbutton-edit").connect("clicked", Lang.bind(this, this.editCity));
+        this.Window.get_object("tree-toolbutton-edit").connect("clicked", Lang.bind(this, this.editAccount));
 
         this.Window.get_object("treeview-selection").connect("changed", Lang.bind(this, function(selection) {
             this.selectionChanged(selection);
@@ -108,7 +103,7 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
 
         this.Window.get_object("button-edit-save").connect("clicked", Lang.bind(this, this.editSave));
 
-	/* Account Name */
+    	/* Account Name */
         let column = new Gtk.TreeViewColumn();
         column.set_title(_("Account"));
         this.treeview.append_column(column);
@@ -120,8 +115,8 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
             arguments[1].markup = arguments[2].get_value(arguments[3], 0);
         });
         
-	/* choosen Provider */
-	column = new Gtk.TreeViewColumn();
+	    /* choosen Provider */
+	    column = new Gtk.TreeViewColumn();
         column.set_title(_("Provider"));
         this.treeview.append_column(column);
 
@@ -131,8 +126,8 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
 		arguments[1].markup = arguments[2].get_value(arguments[3], 1);
         });
 
-	/* Login */	
-	column = new Gtk.TreeViewColumn();
+	    /* Login */
+	    column = new Gtk.TreeViewColumn();
         column.set_title(_("Login"));
         this.treeview.append_column(column);
 
@@ -142,9 +137,9 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
             arguments[1].markup = arguments[2].get_value(arguments[3], 2);
         });
 
-	/* Password */
-/*
-	column = new Gtk.TreeViewColumn();
+    	/* additional */
+        /*
+	    column = new Gtk.TreeViewColumn();
         column.set_title(_("Password"));
         this.treeview.append_column(column);
 
@@ -153,7 +148,7 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
         column.set_cell_data_func(renderer, function() {
 		arguments[1].markup = arguments[2].get_value(arguments[3], 3);
         });
-*/
+        */
 
         let theObjects = this.Window.get_objects();
         for (let i in theObjects) {
@@ -176,24 +171,13 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
         arguments[0].set_text("");
     },
 
+    /*
     onActivateItem: function() {
         this.searchName.set_text(arguments[0].get_label());
     },
-/*
-    placeSearchMenu: function() {
-        let[gx, gy, gw, gh] = this.searchName.get_window().get_geometry();
-        let[px, py] = this.searchName.get_window().get_position();
-        return [gx + px, gy + py + this.searchName.get_allocated_height()];
-    },
-
-    clearSearchMenu: function() {
-        let children = this.searchMenu.get_children();
-        for (let i in children) {
-            this.searchMenu.remove(children[i]);
-        }
-    },
 */
     initEntry: function(theEntry) {
+
         let name = theEntry.get_name();
         theEntry.text = this[name];
         if (this[name].length != 32)
@@ -229,35 +213,34 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
         this.liststore = this.Window.get_object("tree-liststore");
 
 	        
-    	this.Window.get_object("tree-toolbutton-remove").sensitive = Boolean(this.city.length);
-        this.Window.get_object("tree-toolbutton-edit").sensitive = Boolean(this.city.length);
+    	this.Window.get_object("tree-toolbutton-remove").sensitive = Boolean(this.account.length);
+        this.Window.get_object("tree-toolbutton-edit").sensitive = Boolean(this.account.length);
 
 
-        if (mCities != this.city) {
+        if (mCities != this.account) {
             if (this.liststore !== undefined)
                 this.liststore.clear();
 
-            if (this.city.length > 0) {
-                let city = this.city.split(",").map(function(n){ 
+            if (this.account.length > 0) {
+                let account = this.account.split(",").map(function(n){
                     var unserialized = Factory.unserializeCredentialString(n)
                     log(n+" translates to "+unserialized)
                     return Factory.unserializeCredentialString(n);
-                })
+                });
 
-                // TODO 'current' still needed?
                 let current = this.liststore.get_iter_first();
 
-                for (let i in city) {
+                for (let i in account) {
                     current = this.liststore.append();
-                    this.liststore.set_value(current, 0, city[i].label);
-                    this.liststore.set_value(current, 1, city[i].instanceName);
-                    this.liststore.set_value(current, 2, city[i].login);
-                    //this.liststore.set_value(current, 3, "is kept in keystore");
+                    this.liststore.set_value(current, 0, account[i].label);
+                    this.liststore.set_value(current, 1, account[i].instanceName);
+                    this.liststore.set_value(current, 2, account[i].login);
+                    this.liststore.set_value(current, 3, "is kept in keystore");
 
                 }
             }
 
-            mCities = this.city;
+            mCities = this.account;
         }
 
        
@@ -275,16 +258,16 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
     selectionChanged: function(select) {
         let a = select.get_selected_rows(this.liststore)[0][0];
         if (a !== undefined)
-            if (this.actual_city != parseInt(a.to_string()))
-                this.actual_city = parseInt(a.to_string());
+            if (this.actual_account != parseInt(a.to_string()))
+                this.actual_account = parseInt(a.to_string());
     },
 
-    removeCity: function() {
-        let city = this.city.split(",");
-        if (!city.length)
+    removeAccount: function() {
+        let account = this.account.split(",");
+        if (!account.length)
             return 0;
-        let ac = this.actual_city;
-        let textDialog = _("Remove %s ?").format(city[ac]);
+        let ac = this.actual_account;
+        let textDialog = _("Remove %s ?").format(account[ac]);
         let dialog = new Gtk.Dialog({
             title: ""
         });
@@ -308,25 +291,25 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
         dialog_area.pack_start(label, 0, 0, 0);
         dialog.connect("response", Lang.bind(this, function(w, response_id) {
             if (response_id) {
-                if (city.length === 0)
-                    city = [];
+                if (account.length === 0)
+                    account = [];
 
-                if (city.length > 0 && typeof city != "object")
-                    city = [city];
+                if (account.length > 0 && typeof account != "object")
+                    account = [account];
 
-                log("actual city:"+city[this.actual_city]+" on city "+city);
-                Factory.getInstance(city[this.actual_city]).remove();
+                log("actual account:"+account[this.actual_account]+" on account "+account);
+                Factory.getInstance(account[this.actual_account]).remove();
 
-                if (city.length > 0) {
-                    city.splice(ac, 1);
+                if (account.length > 0) {
+                    account.splice(ac, 1);
                 }
 
-                if (city.length > 1)
-                    this.city = city.join(",");
-                else if (city[0])
-                    this.city = city[0];
+                if (account.length > 1)
+                    this.account = account.join(",");
+                else if (account[0])
+                    this.account = account[0];
                 else
-                    this.city = "";
+                    this.account = "";
             }
             dialog.hide();
             return 0;
@@ -336,23 +319,23 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
         return 0;
     },
 
-    editCity: function() {
-	    let city = this.city.split(",").map(function(n){return Factory.unserializeCredentialString(n);});
-        if (!city.length)
+    editAccount: function() {
+	    let account = this.account.split(",").map(function(n){return Factory.unserializeCredentialString(n);});
+        if (!account.length)
             return 0;
-        let ac = this.actual_city;
+        let ac = this.actual_account;
 	
-	    log("log:"+city[ac].label);
-	    this.editName.set_text(city[ac].label);
-        this.editCombo.set_active(this.calculateActiveCombo(city[ac].instanceName));
-        this.editLogin.set_text(city[ac].login);
+	    log("log:"+account[ac].label);
+	    this.editName.set_text(account[ac].label);
+        this.editCombo.set_active(this.calculateActiveCombo(account[ac].instanceName));
+        this.editLogin.set_text(account[ac].login);
 
         try {
             var provider = Factory.getInstanceFromParam(
                 {
-                    label:city[ac].label,
-                    instanceName:city[ac].instanceName,
-                    login:city[ac].login
+                    label:account[ac].label,
+                    instanceName:account[ac].instanceName,
+                    login:account[ac].login
                 });
             provider.retrievePassword((pw) => {
                 this.editPassword.set_text(pw);
@@ -372,16 +355,16 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
     },
 
     editSave: function() {
-        let theCity = this.city.split(",");
+        let theAccount = this.account.split(",");
 
-        if (theCity.length === 0)
+        if (theAccount.length === 0)
             return 0;
-        if (theCity.length > 0 && typeof theCity != "object")
-            theCity = [theCity];
+        if (theAccount.length > 0 && typeof theAccount != "object")
+            theAccount = [theAccount];
 
-        let ac = this.actual_city;
+        let ac = this.actual_account;
 
-        theCity[ac] = Factory.serializeCredentialString({
+        theAccount[ac] = Factory.serializeCredentialString({
             label: this.editName.get_text(),
             login: this.editLogin.get_text(),
             password: this.editPassword.get_text(),
@@ -389,18 +372,18 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
 	    });
 
         this.savePassword(
-            theCity[ac],
+            theAccount[ac],
             this.editPassword.get_text()
         );
 
-        if (theCity.length > 1)
-            this.city = theCity.join(",");
-        else if (theCity[0])
-            this.city = theCity[0];
+        if (theAccount.length > 1)
+            this.account = theAccount.join(",");
+        else if (theAccount[0])
+            this.account = theAccount[0];
 
         this.editWidget.hide();
 
-        this.actual_city = ac;
+        this.actual_account = ac;
 
         return 0;
     },
@@ -436,13 +419,13 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
         }));
     },
 
-    get city() {
+    get account() {
         if (!this.Settings)
             this.loadConfig();
         return this.Settings.get_string(ACCOUNTS_KEY);
     },
 
-    set city(v) {
+    set account(v) {
         if (!this.Settings)
             this.loadConfig();
         this.Settings.set_string(ACCOUNTS_KEY, v);

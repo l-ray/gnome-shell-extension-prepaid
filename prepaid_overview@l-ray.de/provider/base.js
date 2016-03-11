@@ -36,14 +36,6 @@ const BaseProvider = new Lang.Class({
         this.login=login;
         log("base provider keystore:"+keystore);
         this.keystore = keystore;
-        //this.httpLink=link;
-
-        // protocol, server,login, password
-        // keystore.savePassword(protocol,server,port,theObject,login,"malDa");
-        /*
-        keystore.retrievePassword(protocol,server,port,theObject,login,function(pw){
-            log("getrieved password is: "+pw)
-        },true)*/
     },
 
     /*

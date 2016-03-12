@@ -12,6 +12,8 @@ const Factory = Me.imports.provider.factory;
 
 const Soup = imports.gi.Soup;
 
+const Mainloop = imports.mainloop;
+
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const Panel = imports.ui.panel;
@@ -21,23 +23,43 @@ const Util = imports.misc.util;
 const SETTINGS_SCHEMA ='de.l-ray.gnome.shell.extensions.prepaid-overview'
 const ACCOUNTS_KEY = 'accounts';
 
+const RELOAD_INTERVAL = 600000;
+
 let panelItemLabel;
 
 const PrepaidMenuItem = new Lang.Class({
     Name: 'PrepaidMenuItem',
     reactive: false,
     Extends: PopupMenu.PopupBaseMenuItem,
+    concrete: Object(),
+    _httpSession: Object(),
 
-    _init: function(title) {
-	this.parent();
+    _init: function(concrete, _httpSession) {
+        this.parent();
+
+        this.concrete = concrete;
+        this._httpSession = _httpSession;
+        // var title = "dummy";
+        var title = concrete.title;
 
         // this.actor.add_child(this._icon);
         this._box = new St.BoxLayout({style_class: 'pp-box-layout'});
         this._label = new St.Label({ text: "-.--", style_class: 'pp-value' });
-	this._box.add_child(new St.Label({ text: title, style_class: 'pp-label'}));	        
-	this._box.add_child(this._label);
-	this._box.add_child(new St.Label({ text: "€", style_class: 'pp-unit-label'}));	        
-	this.actor.add(this._box);
+        this._box.add_child(new St.Label({ text: title, style_class: 'pp-label'}));
+        this._box.add_child(this._label);
+        this._box.add_child(new St.Label({ text: "€", style_class: 'pp-unit-label'}));
+        this.actor.add(this._box);
+        this.collectData();
+    },
+
+    collectData: function() {
+        this.concrete.collectData(
+            this._httpSession,
+            (amount) => {
+                // log("got amount "+amount);
+                this._label.text = ""+amount;
+            }
+        );
     },
 
     destroy: function() {
@@ -49,7 +71,7 @@ const PrepaidMenuItem = new Lang.Class({
     },
 
     activate: function(event) {
-	this.parent(event);
+    	this.parent(event);
     },
 
 });
@@ -79,30 +101,19 @@ const PrepaidMenu = new Lang.Class({
 	  log("my menu"+this.menu)
 	  var menu = this.menu
 
-  	  this._accounts.forEach(function(n){
 
+        this._menuItems.forEach(function(n){
             log("got item "+n);
-            var concrete = Factory.getInstance(n)
-	    var menuItem = new PrepaidMenuItem(concrete.title);
-            this.menu.addMenuItem(menuItem);
-        
-            concrete.collectData(
-    		_httpSession, 
-		function(amount){
-			// log("got amount "+amount);			
-			menuItem._label.text = ""+amount;
-		}
-	    )
-
+            this.menu.addMenuItem(n);
         },this);
 
 
         /* adding buttons on bottom of window - START */
-	this._buttonMenu = new PopupMenu.PopupBaseMenuItem({
+	    this._buttonMenu = new PopupMenu.PopupBaseMenuItem({
             reactive: false,
             style_class: 'prepaid_overview-menu-button-container'
         });
-        this.menu.addMenuItem(this._buttonMenu);(this._buttonMenu)
+        this.menu.addMenuItem(this._buttonMenu);
 
         this._buttonBox1 = new St.BoxLayout({
             style_class: 'prepaid_overview-button-box'
@@ -129,13 +140,15 @@ const PrepaidMenu = new Lang.Class({
  
         /* adding buttons on bottom of window - END */
 
+        //this.reload(RELOAD_INTERVAL);
+
     },
 
     destroy: function() {
         this.parent();
     },
 
-  loadConfig: function() {
+    loadConfig: function() {
         this._settings = Convenience.getSettings(SETTINGS_SCHEMA);
 
         this._settingsC = this._settings.connect("changed", Lang.bind(this, function() {
@@ -150,6 +163,22 @@ const PrepaidMenu = new Lang.Class({
         return this._settings.get_string(ACCOUNTS_KEY).split(",");
     },
 
+    get _menuItems() {
+        if (this._menuItemsInternal === undefined) {
+            this._menuItemsInternal = this._accounts.map(
+                function(n) {
+                    var concrete = Factory.getInstance(n)
+                    return new PrepaidMenuItem(concrete, _httpSession);
+                }, this)
+        }
+        return this._menuItemsInternal;
+    },
+
+    set _menuItems(val) {
+        this._menuItemsInternal = val
+        return this._menuItemsInternal;
+    },
+
     _onPreferencesActivate: function() {
         this.menu.actor.hide();
         Util.spawn(["gnome-shell-extension-prefs", "prepaid_overview@l-ray.de"]);
@@ -162,10 +191,40 @@ const PrepaidMenu = new Lang.Class({
 
         return button;
     },
+
+    stop: function() {
+        if (_httpSession !== undefined)
+            _httpSession.abort();
+
+        _httpSession = undefined;
+
+        if (this._timeoutCurrent)
+            Mainloop.source_remove(this._timeoutCurrent);
+
+        this._timeoutCurrent = undefined;
+    },
+
+    reload: function(interval) {
+        if (this._timeoutCurrent) {
+            Mainloop.source_remove(this._timeoutCurrent);
+            this._timeoutCurrent = undefined;
+        }
+        // _timeCacheCurrentWeather = new Date();
+        this._timeoutCurrent = Mainloop.timeout_add_seconds(interval, Lang.bind(this, function() {
+            // only invalidate cached data, if we can connect the weather-providers server
+            /*if (this._connected && !this._idle)
+                this.currentWeatherCache = undefined;
+            this.parseWeatherCurrent(); */
+            return true;
+        }));
+    },
+
+
+
 });
 
 
-var _httpSession;
+let _httpSession;
 
 
 function init() {
@@ -179,13 +238,15 @@ function enable() {
 
     let pos = 1;
     if ('apps-menu' in Main.panel.statusArea)
-	pos = 2;
+	    pos = 2;
     Main.panel.addToStatusArea('prepaid-menu', _indicator, pos, 'right');
     // load_json_async()
 }
 
 function disable() {
+    _indicator.stop();
     _indicator.destroy();
+    _indicator = undefined;
 }
 
 

@@ -67,13 +67,13 @@ const Keystore = new Lang.Class({
             log('     keyring id  = '+result[0].item_id);
             log('     keyring  = '+result[0].keyring);
 
-            initialized = true;
+            this.initialized = true;
 
             if (result[0] != undefined) {
                 callback(result[0].secret, result[0].item_id, result[0].keyring)
             }
 
-        }
+        };
 
         if (!initialized && !dontWait) {
             this.idTimeout = Mainloop.timeout_add(20000, function () {

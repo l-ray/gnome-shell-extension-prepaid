@@ -29,7 +29,6 @@ const TMIProvider = new Lang.Class({
             login,
             keystore);
         this._login = login;
-        //Log.Debug("TMI provider");
     },
 
     collectData:function(_httpSession, func) {

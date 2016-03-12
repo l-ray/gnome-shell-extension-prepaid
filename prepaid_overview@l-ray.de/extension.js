@@ -23,7 +23,7 @@ const Util = imports.misc.util;
 const SETTINGS_SCHEMA ='de.l-ray.gnome.shell.extensions.prepaid-overview'
 const ACCOUNTS_KEY = 'accounts';
 
-const RELOAD_INTERVAL = 600000;
+const RELOAD_INTERVAL = 600; // in seconds
 
 let panelItemLabel;
 
@@ -49,7 +49,6 @@ const PrepaidMenuItem = new Lang.Class({
         this._box.add_child(this._label);
         this._box.add_child(new St.Label({ text: "€", style_class: 'pp-unit-label'}));
         this.actor.add(this._box);
-        this.collectData();
     },
 
     collectData: function() {
@@ -122,7 +121,7 @@ const PrepaidMenu = new Lang.Class({
 
         this._reloadButton = this.createButton('view-refresh-symbolic', "Reload Account Balances Information");
         this._reloadButton.connect('clicked', Lang.bind(this, function() {
-            log('RELOAD not yet implemented')
+            this.reload(RELOAD_INTERVAL);
         }));
         this._buttonBox1.add_actor(this._reloadButton);
 
@@ -140,7 +139,7 @@ const PrepaidMenu = new Lang.Class({
  
         /* adding buttons on bottom of window - END */
 
-        //this.reload(RELOAD_INTERVAL);
+        this.reload(RELOAD_INTERVAL);
 
     },
 
@@ -152,6 +151,7 @@ const PrepaidMenu = new Lang.Class({
         this._settings = Convenience.getSettings(SETTINGS_SCHEMA);
 
         this._settingsC = this._settings.connect("changed", Lang.bind(this, function() {
+            this.reload(RELOAD_INTERVAL);
         //    this.rebuildButtonMenu();
         //    this.parseWeatherCurrent();
         }));
@@ -213,10 +213,11 @@ const PrepaidMenu = new Lang.Class({
         this._timeoutCurrent = Mainloop.timeout_add_seconds(interval, Lang.bind(this, function() {
             // only invalidate cached data, if we can connect the weather-providers server
             /*if (this._connected && !this._idle)
-                this.currentWeatherCache = undefined;
-            this.parseWeatherCurrent(); */
+                this.currentWeatherCache = undefined; */
+            this._menuItems.forEach((n) => n.collectData());
             return true;
         }));
+        this._menuItems.forEach((n) => n.collectData());
     },
 
 

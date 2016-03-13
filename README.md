@@ -1,6 +1,6 @@
 # gnome-shell-extension-prepaid
 
-This is a Gnome shell extension that lists your current prepaid balance for multiple services. It shows your current balance in a panel.
+This is a simple Gnome shell extension for displaying your current prepaid balance with multiple services. The current balance is fetched using the providers public APIs and shown in a panel. The passwords for accessing your accounts on the provider APIs are safely stored in Gnome Keyring.
 
 ![screenshot prepaid balance](https://raw.githubusercontent.com/l-ray/gnome-shell-extension-prepaid/master/static/screenshot.png "Screenshot prepaid balance overview")
 

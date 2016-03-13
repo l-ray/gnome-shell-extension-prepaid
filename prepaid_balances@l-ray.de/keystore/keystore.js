@@ -17,6 +17,8 @@ const Keystore = new Lang.Class({
 
     idTimeout: String(),
 
+    cachedCallbacks: [],
+
     // keystore
     savePassword: function (protocol, server,port,object,login, password) {
         GnomeKeyring.unlock_sync(null, null);
@@ -73,13 +75,26 @@ const Keystore = new Lang.Class({
                 callback(result[0].secret, result[0].item_id, result[0].keyring)
             }
 
+            if (this.idTimeout) {
+                this.idTimeout = undefined;
+            }
+
         };
 
         if (!initialized && !dontWait) {
-            this.idTimeout = Mainloop.timeout_add(20000, function () {
-                timeoutCallback ();
-                return false; // Stop repeating
-            }, null);
+            this.cachedCallbacks.push(timeoutCallback)
+            if (this.idTimeout) {
+
+            } else {
+
+                this.idTimeout = Mainloop.timeout_add(20000, () => {
+                    this.cachedCallbacks.forEach( (n) => {
+                        n();
+                    });
+                    this.cachedCallbacks = [];
+                    return false; // Stop repeating
+                }, null);
+            }
         } else {
             timeoutCallback();
         }
@@ -90,5 +105,13 @@ const Keystore = new Lang.Class({
         this.retrievePassword(protocol, server, port, object,login,function(pw, itemId, keyring){
             GnomeKeyring.item_delete_sync(keyring, itemId);
         },true);
+    },
+
+    destroy: function() {
+        if (this.idTimeout) {
+            log("attempt to cancel the keystore timeout");
+            Mainloop.source_remove(this.idTimeout);
+            this.idTimeout = undefined;
+        }
     }
 });

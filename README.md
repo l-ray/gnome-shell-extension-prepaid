@@ -1,6 +1,8 @@
 # gnome-shell-extension-prepaid
-![screenshot prepaid balance](https://raw.githubusercontent.com/l-ray/gnome-shell-extension-prepaid/master/static/screenshot.png "Screenshot prepaid balance overview")
+
 This is a Gnome shell extension that lists your current prepaid balance for multiple services. It shows your current balance in a panel.
+
+![screenshot prepaid balance](https://raw.githubusercontent.com/l-ray/gnome-shell-extension-prepaid/master/static/screenshot.png "Screenshot prepaid balance overview")
 
 ## Installation
  1. get the project (i.e. using git or downloading the [project as zip](https://github.com/l-ray/gnome-shell-extension-prepaid/archive/master.zip))

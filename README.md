@@ -1,5 +1,5 @@
 # gnome-shell-extension-prepaid
-![screenshot prepaid balance](https://github.com/lray/gnome-shell-extension-prepaid/raw/master/static/screenshot.png "Screenshot prepaid balance overview")
+![screenshot prepaid balance](https://raw.githubusercontent.com/l-ray/gnome-shell-extension-prepaid/master/static/screenshot.png "Screenshot prepaid balance overview")
 This is a Gnome shell extension that lists your current prepaid balance for multiple services. It shows your current balance in a panel.
 
 ## Installation
@@ -10,3 +10,9 @@ This is a Gnome shell extension that lists your current prepaid balance for mult
 ## Supports:
  * Sipgate (incl. Simquadrat)
  * Tesco Mobile Ireland
+
+ ## License
+
+This gnome shell extension is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this gnome shell extension. If not, see http://www.gnu.org/licenses/.

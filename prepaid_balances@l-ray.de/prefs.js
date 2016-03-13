@@ -438,20 +438,6 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
         if (!this.Settings)
             this.loadConfig();
         this.Settings.set_string(ACCOUNTS_KEY, v);
-    },
-
-
-    get refresh_interval_current() {
-        if (!this.Settings)
-            this.loadConfig();
-        let v = this.Settings.get_int(OPENWEATHER_REFRESH_INTERVAL_CURRENT);
-        return ((v >= 600) ? v : 600);
-    },
-
-    set refresh_interval_current(v) {
-        if (!this.Settings)
-            this.loadConfig();
-        this.Settings.set_int(OPENWEATHER_REFRESH_INTERVAL_CURRENT, ((v >= 600) ? v : 600));
     }
 });
 

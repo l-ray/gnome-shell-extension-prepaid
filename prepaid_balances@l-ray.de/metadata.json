@@ -1,9 +1,10 @@
 {
-  "name": "Pre-Paid Overview",
-  "uuid": "prepaid_overview@l-ray.de",
+  "name": "Pre-Paid Balances",
+  "uuid": "prepaid_balances@l-ray.de",
   "description": "Collects and shows the current balance on prepaid accounts like mobile phones.",
   "shell-version": [
-    "3.18.3",
-    "3.18.4"
+    "3.14",
+    "3.16",
+    "3.18"
   ]
 }

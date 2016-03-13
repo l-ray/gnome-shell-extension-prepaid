@@ -40,7 +40,10 @@ function getInstanceFromParam(cDto) {
 }
 
 function unserializeCredentialString(credential){
-	log("got credential "+credential);	
+	if (credential === undefined || credential.length == 0) {
+		throw "Illegal Argument for credential string";
+	}
+	log("got credential "+credential);
 	var credRegex = /^"(.*?)"<(.*?)@@(.*?)>$/g;
 	var credArray = credRegex.exec(credential)
 	log("got credential-array "+credArray);

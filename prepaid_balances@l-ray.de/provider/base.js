@@ -68,7 +68,7 @@ const BaseProvider = new Lang.Class({
         );
     },
 
-    remove:function(){
+    removePassword:function(){
         this.keystore.removePassword(
             this.protocol,
             this.server,
@@ -76,6 +76,14 @@ const BaseProvider = new Lang.Class({
             this.theObject,
             this.login
         )
+    },
+
+    destroy:function(){
+        try {
+            this.keystore.destroy();
+        } catch(ex) {
+            log('error during destroy of provider base instance.');
+        }
     }
 
 })

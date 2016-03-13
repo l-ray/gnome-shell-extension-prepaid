@@ -2,7 +2,7 @@
 
 const Gtk = imports.gi.Gtk;
 const GObject = imports.gi.GObject;
-const Gettext = imports.gettext.domain('gnome-shell-extension-prepaid-overview');
+const Gettext = imports.gettext.domain('gnome-shell-extension-prepaid-balances');
 const _ = Gettext.gettext;
 
 const Lang = imports.lang;
@@ -14,8 +14,8 @@ const Factory = Me.imports.provider.factory;
 
 const EXTENSIONDIR = Me.dir.get_path();
 
-const SETTINGS_SCHEMA ='de.l-ray.gnome.shell.extensions.prepaid-overview'
-const ACCOUNTS_KEY = 'accounts'
+const SETTINGS_SCHEMA ='de.l-ray.gnome.shell.extensions.prepaid-balances';
+const ACCOUNTS_KEY = 'accounts';
 
 // Keep enums in sync with GSettings schemas
 const ProviderTemplate = {
@@ -86,7 +86,8 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
         this.editPassword.connect("icon-release", Lang.bind(this, this.clearEntry));
 
         this.Window.get_object("tree-toolbutton-add").connect("clicked", Lang.bind(this, function() {
-            this.account=this.account+","+Factory.serializeCredentialString({label:'',instanceName:'',login:''});
+            var accountPrefix = (this.account && this.account.length>0)?this.account+",":"";
+            this.account=accountPrefix+Factory.serializeCredentialString({label:'',instanceName:'',login:''});
             this.actual_account = this.account.split(",").length-1;
             this.editAccount();
         }));
@@ -223,9 +224,7 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
 
             if (this.account.length > 0) {
                 let account = this.account.split(",").map(function(n){
-                    var unserialized = Factory.unserializeCredentialString(n)
-                    log(n+" translates to "+unserialized)
-                    return Factory.unserializeCredentialString(n);
+                   return Factory.unserializeCredentialString(n);
                 });
 
                 let current = this.liststore.get_iter_first();
@@ -297,8 +296,12 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
                 if (account.length > 0 && typeof account != "object")
                     account = [account];
 
+                try {
                 log("actual account:"+account[this.actual_account]+" on account "+account);
-                Factory.getInstance(account[this.actual_account]).remove();
+                Factory.getInstance(account[this.actual_account]).removePassword();
+                } catch (ex) {
+                    log("Could not remove password from keyring.");
+                }
 
                 if (account.length > 0) {
                     account.splice(ac, 1);
@@ -320,7 +323,10 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
     },
 
     editAccount: function() {
-	    let account = this.account.split(",").map(function(n){return Factory.unserializeCredentialString(n);});
+	    if (!this.account.length) {
+            return 0;
+        }
+        let account = this.account.split(",").map(function(n){return Factory.unserializeCredentialString(n);});
         if (!account.length)
             return 0;
         let ac = this.actual_account;
@@ -329,7 +335,7 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
 	    this.editName.set_text(account[ac].label);
         this.editCombo.set_active(this.calculateActiveCombo(account[ac].instanceName));
         this.editLogin.set_text(account[ac].login);
-
+        this.editPassword.set_text("retrieving from keystore");
         try {
             var provider = Factory.getInstanceFromParam(
                 {
@@ -340,7 +346,10 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
             provider.retrievePassword((pw) => {
                 this.editPassword.set_text(pw);
             },true)
-        } catch (ex) {log(ex);}
+        } catch (ex) {
+            log(ex);
+            this.editPassword.set_text("");
+        }
 
         this.editWidget.show_all();
         return 0;
@@ -447,7 +456,7 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
 });
 
 function init() {
-    Convenience.initTranslations('gnome-shell-extension-prepaid-overview');
+    Convenience.initTranslations('gnome-shell-extension-prepaid-balances');
 }
 
 function buildPrefsWidget() {

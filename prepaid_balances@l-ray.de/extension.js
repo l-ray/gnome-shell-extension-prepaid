@@ -20,7 +20,7 @@ const Panel = imports.ui.panel;
 
 const Util = imports.misc.util;
 
-const SETTINGS_SCHEMA ='de.l-ray.gnome.shell.extensions.prepaid-overview'
+const SETTINGS_SCHEMA ='de.l-ray.gnome.shell.extensions.prepaid-balances'
 const ACCOUNTS_KEY = 'accounts';
 
 const RELOAD_INTERVAL = 600; // in seconds
@@ -62,6 +62,9 @@ const PrepaidMenuItem = new Lang.Class({
     },
 
     destroy: function() {
+        if (this.concrete) {
+            this.concrete.destroy();
+        }
         if (this._changedId) {
              this._changedId = 0;
         }
@@ -83,7 +86,7 @@ const PrepaidMenu = new Lang.Class({
         this.parent(0.0, "Prepaid");
 
         let hbox = new St.BoxLayout({ style_class: 'panel-status-menu-box' });
-        panelItemLabel = new St.Label({ text: "Prepaid",
+        panelItemLabel = new St.Label({ text: "$",
                                    y_expand: true,
                                    y_align: Clutter.ActorAlign.CENTER });
         hbox.add_child(panelItemLabel);
@@ -144,6 +147,7 @@ const PrepaidMenu = new Lang.Class({
     },
 
     destroy: function() {
+        this._menuItems.forEach((mi) => {mi.destroy();});
         this.parent();
     },
 
@@ -151,6 +155,7 @@ const PrepaidMenu = new Lang.Class({
         this._settings = Convenience.getSettings(SETTINGS_SCHEMA);
 
         this._settingsC = this._settings.connect("changed", Lang.bind(this, function() {
+            log("detected that schema was changed!");
             this.reload(RELOAD_INTERVAL);
         //    this.rebuildButtonMenu();
         //    this.parseWeatherCurrent();
@@ -160,16 +165,22 @@ const PrepaidMenu = new Lang.Class({
     get _accounts() {
         if (!this._settings)
             this.loadConfig();
-        return this._settings.get_string(ACCOUNTS_KEY).split(",");
+        var accountKeys = this._settings.get_string(ACCOUNTS_KEY);
+        return accountKeys !== undefined && accountKeys.length > 0 ? accountKeys.split(","):[];
     },
 
     get _menuItems() {
         if (this._menuItemsInternal === undefined) {
+            try {
             this._menuItemsInternal = this._accounts.map(
                 function(n) {
                     var concrete = Factory.getInstance(n)
                     return new PrepaidMenuItem(concrete, _httpSession);
                 }, this)
+            } catch (ex) {
+                log("parsing error creating menu items");
+                this._menuItemsInternal = [];
+            }
         }
         return this._menuItemsInternal;
     },
@@ -181,7 +192,7 @@ const PrepaidMenu = new Lang.Class({
 
     _onPreferencesActivate: function() {
         this.menu.actor.hide();
-        Util.spawn(["gnome-shell-extension-prefs", "prepaid_overview@l-ray.de"]);
+        Util.spawn(["gnome-shell-extension-prefs", "prepaid_balances@l-ray.de"]);
         return 0;
     },
     createButton: function(iconName, accessibleName) {

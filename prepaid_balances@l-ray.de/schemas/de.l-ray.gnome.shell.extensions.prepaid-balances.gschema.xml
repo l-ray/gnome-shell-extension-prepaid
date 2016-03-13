@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="de-lray-gnome-shell-extensions-prepaid-balances">
+  <!--enum id="de.l-ray.gnome.shell.extensions.prepaid-balances.provider">
+    <value value="0" nick="sipgate"/>
+    <value value="1" nick="tesco-mobile-ie"/>
+  </enum-->
+
+  <schema path="/de/l-ray/gnome/shell/extensions/prepaid-balances/" id="de.l-ray.gnome.shell.extensions.prepaid-balances">
+    <key type="s" name="accounts">
+      <default>''</default>
+      <summary>comma-separated list of accounts in the format "Label"&lt;login@@provider&gt;</summary>
+    </key>
+    <!-- Common defaults -->
+    <key type="i" name="refresh-interval-current">
+      <default>900</default>
+      <summary>Refresh interval (actual amount)</summary>
+    </key>
+
+  </schema>
+</schemalist>

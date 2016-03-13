@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Generated with glade 3.19.0 -->
-<interface domain="gnome-shell-extension-prepaid-overview">
+<interface domain="gnome-shell-extension-prepaid-balances">
   <requires lib="gtk+" version="3.8"/>
   <object class="GtkAdjustment" id="current-refresh-adjustment">
     <property name="lower">10</property>

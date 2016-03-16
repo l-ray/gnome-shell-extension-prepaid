@@ -60,7 +60,7 @@ const TMIProvider = new Lang.Class({
                     let jp = JSON.parse(message.response_body.data);
 
                     var result = message.response_body.data
-                    log(message.response_body.data)
+                    //log(message.response_body.data)
                     func(jp.mainBalance);
 
                 } catch (e) {
@@ -74,7 +74,7 @@ const TMIProvider = new Lang.Class({
             _httpSession.connect('authenticate', Lang.bind(this, function (session, message, auth, retryFlag) {
                 if (retryFlag) return;
                 log("retry:" + retryFlag);
-                log("Login:" + _login + ", password " + _password)
+                //log("Login:" + _login + ", password " + _password)
                 auth.authenticate(_login, _password);
                 return;
             }));

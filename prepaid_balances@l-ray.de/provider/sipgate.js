@@ -56,7 +56,7 @@ const SipgateProvider = new Lang.Class({
                     }
 
                     var result = message.response_body.data
-                    log(message.response_body.data)
+                    // log(message.response_body.data)
                     func(
                         /TotalIncludingVat<\/name><value><double>([0-9]+\.[0-9]{1,2})/.exec(result)[1]
                     );
@@ -72,7 +72,7 @@ const SipgateProvider = new Lang.Class({
             _httpSession.connect('authenticate', Lang.bind(this, function (session, message, auth, retryFlag) {
                 if (retryFlag) return;
                 log("retry:" + retryFlag);
-                log("Login:" + _login + ", password " + _password)
+                //log("Login:" + _login + ", password " + _password)
                 auth.authenticate(_login, _password);
                 return;
             }));

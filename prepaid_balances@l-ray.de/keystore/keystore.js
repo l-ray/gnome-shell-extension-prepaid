@@ -40,8 +40,6 @@ const Keystore = new Lang.Class({
     },
 
     retrievePassword:function (protocol, server, port, theObject, login, callback,dontWait = false) {
-        //savePassword(instanceName, login, "test234")
-        //GnomeKeyring.unlock_sync(null, null)
 
         var initialized = this.initialized || dontWait;
 
@@ -65,7 +63,8 @@ const Keystore = new Lang.Class({
 
             if (status != GnomeKeyring.Result.OK) return;
 
-            log('  => password '+result[0].secret);
+            //log('  => found password '+result[0].secret);
+            log('  => found password');
             log('     keyring id  = '+result[0].item_id);
             log('     keyring  = '+result[0].keyring);
 

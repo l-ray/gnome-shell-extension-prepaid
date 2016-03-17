@@ -164,8 +164,8 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
                 this.configWidgets.push([theObjects[i], name]);
             }
         }
-        if (Me.metadata.version !== undefined)
-            this.Window.get_object('version').set_label(Me.metadata.version.toString());
+        /*if (Me.metadata.version !== undefined)
+            this.Window.get_object('version').set_label(Me.metadata.version.toString()); */
     },
 
     clearEntry: function() {

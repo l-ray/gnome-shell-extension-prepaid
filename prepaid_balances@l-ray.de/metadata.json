@@ -6,5 +6,8 @@
     "3.14",
     "3.16",
     "3.18"
-  ]
+  ],
+  "url": "http://github.com/l-ray/gnome-shell-extension-prepaid/",
+  "uuid": "prepaid_balances@l-ray.de",
+  "version": 1
 }

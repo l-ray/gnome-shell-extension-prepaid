@@ -45,15 +45,14 @@ const BaseProvider = new Lang.Class({
         // child classes implements this 'abstract' function
     },
 
-    retrievePassword: function(callback,dontWait) {
+    retrievePassword: function(callback) {
         return this.keystore.retrievePassword(
             this.protocol,
             this.server,
             this.port,
             this.theObject,
             this.login,
-            callback,
-            dontWait
+            callback
         );
     },
 

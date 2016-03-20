@@ -1,8 +1,20 @@
 const Lang = imports.lang;
 
-const GnomeKeyring = imports.gi.GnomeKeyring;
+const Secret = imports.gi.Secret;
 
-const Mainloop = imports.mainloop;
+const SECRET_SCHEMA_NETWORK_COMPAT = Secret.Schema.new("org.gnome.keyring.NetworkPassword",
+    Secret.SchemaFlags.NONE,
+    {
+        "user": Secret.SchemaAttributeType.STRING,
+        "domain": Secret.SchemaAttributeType.STRING,
+        "object": Secret.SchemaAttributeType.STRING,
+        "protocol": Secret.SchemaAttributeType.STRING,
+        "server": Secret.SchemaAttributeType.STRING,
+        "authtype": Secret.SchemaAttributeType.STRING,
+
+        "port": Secret.SchemaAttributeType.INTEGER
+    }
+);
 
 
 /*
@@ -13,104 +25,73 @@ const Keystore = new Lang.Class({
 
     Name: 'Keystore',
 
-    initialized: false,
-
-    idTimeout: String(),
-
-    cachedCallbacks: [],
-
     // keystore
     savePassword: function (protocol, server,port,object,login, password) {
-        GnomeKeyring.unlock_sync(null, null);
-        var id=login+"@"+server;
-        log('Adding keyring entry for id ' + id);
-        //GnomeKeyring.create_sync(keyringName, None)
 
-        var attrObj = GnomeKeyring.Attribute;
-        var attrs = attrObj.list_new();
-
-        //attrObj.list_append_string(attrs, 'id', id);
-        attrObj.list_append_string(attrs, 'user', login);
-        attrObj.list_append_string(attrs, 'server', server);
-        attrObj.list_append_string(attrs, 'protocol', protocol);
-        attrObj.list_append_uint32(attrs, 'port', port);
-        //attrObj.list_append_string(attrs, 'object', object);
-        GnomeKeyring.item_create_sync(null, GnomeKeyring.ItemType.NETWORK_PASSWORD, id, attrs, password, true);
-        log('  => Stored.')
-    },
-
-    retrievePassword:function (protocol, server, port, theObject, login, callback,dontWait = false) {
-
-        var initialized = this.initialized || dontWait;
-
-        log("generating callback for retrieving password");
-        var timeoutCallback = () => {
-
-            log('Fetch secret for id '+login+'@'+server);
-
-            var attrObj = GnomeKeyring.Attribute;
-            var attrs = attrObj.list_new();
-
-            attrObj.list_append_string(attrs, 'user', login);
-            attrObj.list_append_string(attrs, 'server', server);
-            attrObj.list_append_string(attrs, 'protocol', protocol);
-            attrObj.list_append_uint32(attrs, 'port', port);
-            //attrObj.list_append_string(attrs, 'object', theObject);
-
-            var [status, result] = GnomeKeyring.find_items_sync(GnomeKeyring.ItemType.NETWORK_PASSWORD, attrs);
-
-            log('Result:'+status+' and '+result+' with '+ result[0] +' and '+result.length+' keyring result ok is '+GnomeKeyring.Result.OK);
-
-            if (status != GnomeKeyring.Result.OK) return;
-
-            //log('  => found password '+result[0].secret);
-            log('  => found password');
-            log('     keyring id  = '+result[0].item_id);
-            log('     keyring  = '+result[0].keyring);
-
-            this.initialized = true;
-
-            if (result[0] != undefined) {
-                callback(result[0].secret, result[0].item_id, result[0].keyring)
-            }
-
-            if (this.idTimeout) {
-                this.idTimeout = undefined;
-            }
-
+        var attributes = {
+            "user": login,
+            "server": server,
+            "protocol":protocol,
+            "port":port
+            //"object":theObject
         };
 
-        if (!initialized && !dontWait) {
-            this.cachedCallbacks.push(timeoutCallback)
-            if (this.idTimeout) {
+        var id=login+"@"+server;
 
-            } else {
+        Secret.password_store_sync(SECRET_SCHEMA_NETWORK_COMPAT, attributes, Secret.COLLECTION_DEFAULT,
+            id, password, null);
+        log('  => Stored.');
+    },
 
-                this.idTimeout = Mainloop.timeout_add(20000, () => {
-                    this.cachedCallbacks.forEach( (n) => {
-                        n();
-                    });
-                    this.cachedCallbacks = [];
-                    return false; // Stop repeating
-                }, null);
-            }
-        } else {
-            timeoutCallback();
+    retrievePassword:function (protocol, server, port, theObject, login, callback) {
+
+        //log('Fetch secret for id '+login+'@'+server);
+
+        function internalCallback(source,result) {
+            var password = Secret.password_lookup_finish(result);
+            // result[0].item_id, result[0].keyring
+            log('  => found password ');
+            log('     source  = '+source);
+            log('     result  = '+result);
+
+            return callback(password, source, null)
         }
+
+        Secret.password_lookup(
+            SECRET_SCHEMA_NETWORK_COMPAT,
+            { "user": login,
+              "server": server,
+              "protocol":protocol,
+              "port":port//,
+              //"object":theObject
+            },
+            null, internalCallback);
+
     },
 
     // keystore
-    removePassword: function (protocol, server,port,object,login) {
-        this.retrievePassword(protocol, server, port, object,login,function(pw, itemId, keyring){
-            GnomeKeyring.item_delete_sync(keyring, itemId);
-        },true);
+    removePassword: function (protocol, server,port, theObject,login) {
+
+        function on_password_clear(source, result) {
+            var removed = Secret.password_clear_finish(result);
+            // removed will be true if the password was removed
+            log(removed?"password removed from keystore":"error removing password");
+        }
+
+        // The attributes used to lookup which password to remove should conform to the schema.
+        Secret.password_clear(
+            SECRET_SCHEMA_NETWORK_COMPAT,
+             {
+                 "user": login,
+                 "server": server,
+                 "protocol":protocol,
+                 "port":port
+                 //"object":theObject
+             },
+             null, on_password_clear);
     },
 
     destroy: function() {
-        if (this.idTimeout) {
-            log("attempt to cancel the keystore timeout");
-            Mainloop.source_remove(this.idTimeout);
-            this.idTimeout = undefined;
-        }
+            // nothing to destroy at the moment
     }
 });

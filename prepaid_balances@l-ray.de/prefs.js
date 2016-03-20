@@ -345,7 +345,7 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
                 });
             provider.retrievePassword((pw) => {
                 this.editPassword.set_text(pw);
-            },true)
+            })
         } catch (ex) {
             log(ex);
             this.editPassword.set_text("");

@@ -11,8 +11,6 @@ const TMIProvider = new Lang.Class({
 
     Name: 'TescoMobileIrelandProvider',
     Extends: Base.BaseProvider,
-    _login: String(),
-    _password: String(), 
 
     /*
      *  Initialize the instance of SipgateProvider class
@@ -28,16 +26,16 @@ const TMIProvider = new Lang.Class({
             "/tmi-selfcare-web/rest/customer/balance",
             login,
             keystore);
-        this._login = login;
     },
 
     collectData:function(_httpSession, func) {
 
-        var _login = this._login;
+        var _login = this.login;
+        var _uri = this.getUri();
 
         var callback = function (_password) {
             let message =
-                Soup.form_request_new_from_hash('GET', "https://my.tescomobile.ie/tmi-selfcare-web/rest/customer/balance", {})
+                Soup.form_request_new_from_hash('GET', _uri, {});
 
             let auth = new Soup.AuthBasic()
 
@@ -50,7 +48,7 @@ const TMIProvider = new Lang.Class({
                 try {
 
                     if (!message.response_body.data) {
-                        log("Error " + message.status_code)
+                        log("Error " + message.status_code);
                         //fun.call(this, 0);
                         return;
                     } else {
@@ -59,12 +57,12 @@ const TMIProvider = new Lang.Class({
 
                     let jp = JSON.parse(message.response_body.data);
 
-                    var result = message.response_body.data
+                    var result = message.response_body.data;
                     //log(message.response_body.data)
                     func(jp.mainBalance);
 
                 } catch (e) {
-                    log("Exception " + e)
+                    log("Exception " + e);
                     return;
                 }
 

@@ -11,9 +11,6 @@ const SipgateProvider = new Lang.Class({
 
     Name: 'SipgateProvider',
     Extends: Base.BaseProvider,
-    _login: String(),
-    _password: String(), 
-
 
     /*
      *  Initialize the instance of SipgateProvider class
@@ -28,16 +25,16 @@ const SipgateProvider = new Lang.Class({
             "/RPC2",
             login,
             keystore);
-        this._login = login;
         //Log.Debug("Sipgate provider");
     },
 
     collectData:function(_httpSession, func){
-        var _login =  this._login;
+        var _login =  this.login;
+        var _uri = this.getUri();
 
         var callback = function(_password) {
             let message =
-                Soup.xmlrpc_message_new("https://api.sipgate.net/RPC2", "samurai.BalanceGet", new GLib.Variant('()', 1.0))
+                Soup.xmlrpc_message_new(_uri, "samurai.BalanceGet", new GLib.Variant('()', 1.0));
 
             let auth = new Soup.AuthBasic()
 
@@ -62,12 +59,12 @@ const SipgateProvider = new Lang.Class({
                     );
 
                 } catch (e) {
-                    log("Exception " + e)
+                    log("Exception " + e);
                     return;
                 }
 
                 return;
-            }
+            };
 
             _httpSession.connect('authenticate', Lang.bind(this, function (session, message, auth, retryFlag) {
                 if (retryFlag) return;

@@ -45,6 +45,10 @@ const BaseProvider = new Lang.Class({
         // child classes implements this 'abstract' function
     },
 
+    getUri: function() {
+        return this.protocol+"://"+this.server+":"+this.port+this.theObject
+    },
+
     retrievePassword: function(callback) {
         return this.keystore.retrievePassword(
             this.protocol,

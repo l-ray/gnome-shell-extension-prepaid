@@ -12,6 +12,7 @@ This is a simple Gnome shell extension for displaying your current prepaid balan
 ## Supports:
  * Sipgate (incl. Simquadrat)
  * Tesco Mobile Ireland
+ * Leapcard
 
 ## License
 

@@ -21,7 +21,8 @@ const ACCOUNTS_KEY = 'accounts';
 const ProviderTemplate = {
     // DEFAULT: -1,
     SIPGATE: 0,
-    TESCO_MOBILE_IE: 1
+    TESCO_MOBILE_IE: 1,
+    LEAPCARD_IE: 2
 };
 
 let mCities = null;

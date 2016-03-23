@@ -1,6 +1,8 @@
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Sipgate = Me.imports.provider.sipgate;
 const TMI = Me.imports.provider.tmi;
+const LeapCard = Me.imports.provider.leapcard;
+
 
 const Keystore = Me.imports.keystore.keystore;
 
@@ -29,6 +31,10 @@ function getInstanceFromParam(cDto) {
 
 	if (cDto.instanceName == "TESCO_MOBILE_IE") {
 		return new TMI.TMIProvider(cDto.login, keystore, cDto.label);
+	}
+
+	if (cDto.instanceName == "LEAPCARD_IE") {
+		return new LeapCard.LeapCardProvider(cDto.login, keystore, cDto.label);
 	}
 
    }

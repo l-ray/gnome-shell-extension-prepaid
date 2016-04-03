@@ -81,6 +81,7 @@ const PrepaidMenuItem = new Lang.Class({
 const PrepaidMenu = new Lang.Class({
     Name: 'PrepaidMenu.PrepaidMenu',
     Extends: PanelMenu.Button,
+    _balancesSection: Object(),
 
     _init: function() {
         this.parent(0.0, "Prepaid");
@@ -98,17 +99,12 @@ const PrepaidMenu = new Lang.Class({
         } else {
             // abort previous requests.
             _httpSession.abort();
-        }        
+        }
 
-	  log("my menu"+this.menu)
-	  var menu = this.menu
+        var menu = this.menu;
 
-
-        this._menuItems.forEach(function(n){
-            log("got item "+n);
-            this.menu.addMenuItem(n);
-        },this);
-
+        this._balancesSection = new PopupMenu.PopupMenuSection();
+        this.menu.addMenuItem(this._balancesSection);
 
         /* adding buttons on bottom of window - START */
 	    this._buttonMenu = new PopupMenu.PopupBaseMenuItem({
@@ -142,6 +138,7 @@ const PrepaidMenu = new Lang.Class({
  
         /* adding buttons on bottom of window - END */
 
+        this.buildBalances();
         this.reload(RELOAD_INTERVAL);
 
     },
@@ -156,10 +153,23 @@ const PrepaidMenu = new Lang.Class({
 
         this._settingsC = this._settings.connect("changed", Lang.bind(this, function() {
             log("detected that schema was changed!");
+            this.buildBalances();
             this.reload(RELOAD_INTERVAL);
         //    this.rebuildButtonMenu();
         //    this.parseWeatherCurrent();
         }));
+    },
+
+    buildBalances: function(){
+        this._balancesSection.removeAll();
+        try {
+            this._menuItemsInternal.forEach(function(n){ n.destroy();});
+            this._menuItemsInternal = undefined;
+        } catch (e) {}
+        this._menuItems.forEach(function(n){
+            log("got item "+n);
+            this._balancesSection.addMenuItem(n);
+        },this);
     },
 
     get _accounts() {

@@ -73,7 +73,8 @@ const PrepaidMenuItem = new Lang.Class({
     },
 
     activate: function(event) {
-    	this.parent(event);
+        this.concrete.launchBalanceManagement();
+        this._getTopMenu().actor.hide();
     },
 
 });
@@ -188,7 +189,7 @@ const PrepaidMenu = new Lang.Class({
                     return new PrepaidMenuItem(concrete, _httpSession);
                 }, this)
             } catch (ex) {
-                log("parsing error creating menu items");
+                log("parsing error creating menu items:"+ex);
                 this._menuItemsInternal = [];
             }
         }

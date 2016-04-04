@@ -24,6 +24,7 @@ const TMIProvider = new Lang.Class({
             "my.tescomobile.ie",
             "443",
             "/tmi-selfcare-web/rest/customer/balance",
+            "/tmi-selfcare-web/login",
             login,
             keystore);
     },

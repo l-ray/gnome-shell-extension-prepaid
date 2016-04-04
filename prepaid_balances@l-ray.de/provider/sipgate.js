@@ -23,6 +23,7 @@ const SipgateProvider = new Lang.Class({
             "api.sipgate.net",
             "443",
             "/RPC2",
+            "https://www.sipgate.de/basic/dashboard",
             login,
             keystore);
         //Log.Debug("Sipgate provider");

@@ -32,9 +32,12 @@ const LeapCardProvider = new Lang.Class({
             "www.leapcard.ie",
             "443",
             "/en/login.aspx",
+            "/en/login.aspx",
             login,
             keystore);
     },
+
+
 
     collectData:function(_httpSession, func) {
 

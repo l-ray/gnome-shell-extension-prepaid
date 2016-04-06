@@ -2,7 +2,7 @@ const Lang = imports.lang;
 
 const Gtk = imports.gi.Gtk;
 
-const Main = imports.ui.main;
+//const Main = imports.ui.main;
 
 /*
  *  Base 'abstract' class for balance provider. Every format inherits from this class
@@ -64,7 +64,8 @@ const BaseProvider = new Lang.Class({
                 Gtk.show_uri(null, url, global.get_current_time());
             } catch (err) {
                 let title = "Can not open %s".format(url);
-                Main.notifyError(title, err.message);
+                log(title+"  "+err.message);
+                //Main.notifyError(title, err.message);
             }
     },
 

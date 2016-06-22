@@ -2,7 +2,7 @@ const Lang = imports.lang;
 
 const Gtk = imports.gi.Gtk;
 
-//const Main = imports.ui.main;
+const PARSE_NUMBER_REGEX = /(\d{0,6})\.?(\d{0,2})/;
 
 /*
  *  Base 'abstract' class for balance provider. Every format inherits from this class
@@ -20,12 +20,13 @@ const BaseProvider = new Lang.Class({
     login: String(),
     link: String(),
     keystore: Object(),
+    limit: Number(),
 
     /*
      *  Initialize the instance of BaseProvider class
      *  root - root element of feed file
      */
-    _init: function(title,protocol,server,port,theObject,link,login,keystore) {
+    _init: function(title,protocol,server,port,theObject,link,login,keystore,limit) {
         this.title=title;
         this.protocol=protocol;
         this.server=server;
@@ -35,12 +36,24 @@ const BaseProvider = new Lang.Class({
         this.login=login;
         log("base provider keystore:"+keystore);
         this.keystore = keystore;
+        this.limit = limit;
+    },
+
+    collectData: function(_httpSession, func) {
+        return this.collectDataInternal(
+            _httpSession,
+            (extract) => {
+                func(
+                    this.convertToCents(extract)
+                );
+            }
+        );
     },
 
     /*
      *  Abstract function to Parse feed file
      */
-    collectData: function(_httpSession, func) {
+    collectDataInternal: function() {
         // child classes implements this 'abstract' function
         throw "Not implemented by concrete class."
     },
@@ -107,6 +120,14 @@ const BaseProvider = new Lang.Class({
         } catch(ex) {
             log('error during destroy of provider base instance.');
         }
+    },
+
+    convertToCents:function(amountString){
+        var groups = PARSE_NUMBER_REGEX.exec(amountString.trim());
+        var euros = Number(groups[1]);
+        // differ between e.g. 0.20 and 0.2
+        var cents = Number(groups[2].length == 1 ? groups[2]+"0":groups[2]);
+        return euros*100+cents;
     }
 
-})
+});

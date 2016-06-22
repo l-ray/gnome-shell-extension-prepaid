@@ -19,7 +19,6 @@ const ACCOUNTS_KEY = 'accounts';
 
 // Keep enums in sync with GSettings schemas
 const ProviderTemplate = {
-    // DEFAULT: -1,
     SIPGATE: 0,
     TESCO_MOBILE_IE: 1,
     LEAPCARD_IE: 2
@@ -81,14 +80,16 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
         this.editLogin = this.Window.get_object("edit-login");
         this.editCombo = this.Window.get_object("edit-combo");
         this.editPassword = this.Window.get_object("edit-password");
+        this.editLimit = this.Window.get_object("edit-limit");
 
         this.editName.connect("icon-release", Lang.bind(this, this.clearEntry));
         this.editLogin.connect("icon-release", Lang.bind(this, this.clearEntry));
         this.editPassword.connect("icon-release", Lang.bind(this, this.clearEntry));
+        this.editLimit.connect("icon-release", Lang.bind(this, this.clearEntry));
 
         this.Window.get_object("tree-toolbutton-add").connect("clicked", Lang.bind(this, function() {
             var accountPrefix = (this.account && this.account.length>0)?this.account+",":"";
-            this.account=accountPrefix+Factory.serializeCredentialString({label:'',instanceName:'',login:''});
+            this.account=accountPrefix+Factory.serializeCredentialString({label:'',instanceName:'',login:'',amountLimit:'0'});
             this.actual_account = this.account.split(",").length-1;
             this.editAccount();
         }));
@@ -139,18 +140,16 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
             arguments[1].markup = arguments[2].get_value(arguments[3], 2);
         });
 
-    	/* additional */
-        /*
+    	/* warning amount */
 	    column = new Gtk.TreeViewColumn();
-        column.set_title(_("Password"));
+        column.set_title(_("Warning amount in cent"));
         this.treeview.append_column(column);
 
         column.pack_start(renderer, null);
 
         column.set_cell_data_func(renderer, function() {
-		arguments[1].markup = arguments[2].get_value(arguments[3], 3);
+            arguments[1].markup = arguments[2].get_value(arguments[3], 3).toString();
         });
-        */
 
         let theObjects = this.Window.get_objects();
         for (let i in theObjects) {
@@ -235,8 +234,7 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
                     this.liststore.set_value(current, 0, account[i].label);
                     this.liststore.set_value(current, 1, account[i].instanceName);
                     this.liststore.set_value(current, 2, account[i].login);
-                    this.liststore.set_value(current, 3, "is kept in keystore");
-
+                    this.liststore.set_value(current, 3, account[i].amountLimit);
                 }
             }
 
@@ -332,17 +330,19 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
             return 0;
         let ac = this.actual_account;
 	
-	    log("log:"+account[ac].label);
+	    log("log:"+account[ac].label+" amountLimit "+account[ac].amountLimit+" limit "+account[ac].limit);
 	    this.editName.set_text(account[ac].label);
         this.editCombo.set_active(this.calculateActiveCombo(account[ac].instanceName));
         this.editLogin.set_text(account[ac].login);
+        this.editLimit.set_text(account[ac].amountLimit.toString()||"0");
         this.editPassword.set_text("retrieving from keystore");
         try {
             var provider = Factory.getInstanceFromParam(
                 {
                     label:account[ac].label,
                     instanceName:account[ac].instanceName,
-                    login:account[ac].login
+                    login:account[ac].login,
+                    amountLimit:account[ac].amountLimit
                 });
             provider.retrievePassword((pw) => {
                 this.editPassword.set_text(pw);
@@ -378,6 +378,7 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
             label: this.editName.get_text(),
             login: this.editLogin.get_text(),
             password: this.editPassword.get_text(),
+            amountLimit: this.editLimit.get_text(),
             instanceName: Object.keys(ProviderTemplate)[this.editCombo.get_active()]
 	    });
 
@@ -410,6 +411,7 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
         this.editName.set_text("");
         this.editLogin.set_text("");
         this.editPassword.set_text("");
+        this.editLimit.set_text("");
 	    this.editCombo.set_active(-1);
         this.editWidget.hide();
     },

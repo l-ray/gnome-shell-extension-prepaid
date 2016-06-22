@@ -25,7 +25,7 @@ const LeapCardProvider = new Lang.Class({
      *  Initialize the instance of LeapCardProvider class
      *  root - root element of feed file
      */
-    _init: function(login,keystore, label) {
+    _init: function(login,keystore, label, amountLimit) {
         this.parent(
             label,
             "https",
@@ -34,12 +34,14 @@ const LeapCardProvider = new Lang.Class({
             "/en/login.aspx",
             "/en/login.aspx",
             login,
-            keystore);
+            keystore,
+            amountLimit
+        );
     },
 
 
 
-    collectData:function(_httpSession, func) {
+    collectDataInternal:function(_httpSession, func) {
 
         var _login = this.login;
         var _uri = this.getUri();

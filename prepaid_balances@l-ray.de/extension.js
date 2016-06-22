@@ -56,7 +56,7 @@ const PrepaidMenuItem = new Lang.Class({
             this._httpSession,
             (amount) => {
                 // log("got amount "+amount);
-                this._label.text = ""+amount;
+                this._label.text = Number(amount/100).toFixed(2);
             }
         );
     },
@@ -156,8 +156,6 @@ const PrepaidMenu = new Lang.Class({
             log("detected that schema was changed!");
             this.buildBalances();
             this.reload(RELOAD_INTERVAL);
-        //    this.rebuildButtonMenu();
-        //    this.parseWeatherCurrent();
         }));
     },
 
@@ -232,11 +230,12 @@ const PrepaidMenu = new Lang.Class({
             this._timeoutCurrent = undefined;
         }
         // _timeCacheCurrentWeather = new Date();
+        var _menuItems = this._menuItems;
         this._timeoutCurrent = Mainloop.timeout_add_seconds(interval, Lang.bind(this, function() {
-            // only invalidate cached data, if we can connect the weather-providers server
+            // only invalidate cached data, if we can connect the providers server
             /*if (this._connected && !this._idle)
                 this.currentWeatherCache = undefined; */
-            this._menuItems.forEach((n) => n.collectData());
+            _menuItems.forEach((n) => n.collectData());
             return true;
         }));
         this._menuItems.forEach((n) => n.collectData());

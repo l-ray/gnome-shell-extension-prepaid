@@ -16,7 +16,7 @@ const SipgateProvider = new Lang.Class({
      *  Initialize the instance of SipgateProvider class
      *  root - root element of feed file
      */
-    _init: function(login,keystore,label) {
+    _init: function(login,keystore,label,amountLimit) {
         this.parent(
             label,
             "https",
@@ -25,11 +25,13 @@ const SipgateProvider = new Lang.Class({
             "/RPC2",
             "https://www.sipgate.de/basic/dashboard",
             login,
-            keystore);
+            keystore,
+            amountLimit
+        );
         //Log.Debug("Sipgate provider");
     },
 
-    collectData:function(_httpSession, func){
+    collectDataInternal:function(_httpSession, func){
         var _login =  this.login;
         var _uri = this.getUri();
 

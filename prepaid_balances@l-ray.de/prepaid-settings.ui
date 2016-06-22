@@ -179,7 +179,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkSeparator" id="separator2">
+          <object class="GtkSeparator" id="separator3">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="margin_top">5</property>
@@ -191,26 +191,72 @@
             <property name="position">8</property>
           </packing>
         </child>
+        <child>
+          <object class="GtkLabel" id="label_limit">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="halign">start</property>
+            <property name="hexpand">True</property>
+            <property name="label" translatable="yes">Edit Warning amount</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">9</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="edit-limit">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="hexpand">True</property>
+            <property name="secondary_icon_name">edit-clear-symbolic</property>
+            <property name="primary_icon_activatable">False</property>
+            <property name="primary_icon_sensitive">False</property>
+            <property name="secondary_icon_tooltip_text" translatable="yes">Clear entry</property>
+            <property name="secondary_icon_tooltip_markup" translatable="yes">Clear entry</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">10</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkSeparator" id="separator2">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="margin_top">5</property>
+            <property name="margin_bottom">5</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">11</property>
+          </packing>
+        </child>
       </object>
     </child>
   </object>
   <object class="GtkListStore" id="tree-liststore">
     <columns>
+      <!-- column-name isActive -->
+      <!-- column type="gchararray"/ -->
       <!-- column-name title -->
       <column type="gchararray"/>
       <!-- column-name provider -->
       <column type="gchararray"/>
       <!-- column-name login -->
       <column type="gchararray"/>
-      <!-- column-name password -->
-      <!-- column type="gchararray"/ -->
+      <!-- column-name warning amount -->
+      <column type="gint"/>
     </columns>
     <data>
       <row>
         <col id="0">dummy</col>
         <col id="1">dummy</col>
         <col id="2" translatable="yes">dummy</col>
-        <!-- col id="3" translatable="yes">dummy</col -->
+        <col id="3" translatable="yes">520</col>
       </row>
     </data>
   </object>

@@ -26,15 +26,15 @@ function getInstanceFromParam(cDto) {
 	log("searching type: |"+cDto.instanceName+"| with keystore |"+keystore+"|")
 
 	if (cDto.instanceName == "SIPGATE") {
-		return new Sipgate.SipgateProvider(cDto.login, keystore, cDto.label);
+		return new Sipgate.SipgateProvider(cDto.login, keystore, cDto.label, cDto.amountLimit);
 	}
 
 	if (cDto.instanceName == "TESCO_MOBILE_IE") {
-		return new TMI.TMIProvider(cDto.login, keystore, cDto.label);
+		return new TMI.TMIProvider(cDto.login, keystore, cDto.label, cDto.amountLimit);
 	}
 
 	if (cDto.instanceName == "LEAPCARD_IE") {
-		return new LeapCard.LeapCardProvider(cDto.login, keystore, cDto.label);
+		return new LeapCard.LeapCardProvider(cDto.login, keystore, cDto.label, cDto.amountLimit);
 	}
 
    }
@@ -50,16 +50,17 @@ function unserializeCredentialString(credential){
 		throw "Illegal Argument for credential string";
 	}
 	log("got credential "+credential);
-	var credRegex = /^"(.*?)"<(.*?)@@(.*?)>$/g;
-	var credArray = credRegex.exec(credential)
+	var credRegex = /^"(.*?)"<(.*?)@@(.*?)(?::(.*?))?>$/g;
+	var credArray = credRegex.exec(credential);
 	log("got credential-array "+credArray);
 	return {
 		label: credArray[1],
 		login: credArray[2],
-		instanceName: credArray[3]
+		instanceName: credArray[3],
+		amountLimit: Number(credArray[4])
 	}
 }
 
 function serializeCredentialString(c){
-	return "\""+c.label+"\"<"+c.login+"@@"+c.instanceName+">"
+	return "\""+c.label+"\"<"+c.login+"@@"+c.instanceName+":"+c.amountLimit+">"
 }

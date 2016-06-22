@@ -16,7 +16,7 @@ const TMIProvider = new Lang.Class({
      *  Initialize the instance of SipgateProvider class
      *  root - root element of feed file
      */
-    _init: function(login,keystore, label) {
+    _init: function(login,keystore, label, amountLimit) {
         log("TMI keystore:"+keystore);
         this.parent(
             label,
@@ -26,10 +26,12 @@ const TMIProvider = new Lang.Class({
             "/tmi-selfcare-web/rest/customer/balance",
             "/tmi-selfcare-web/login",
             login,
-            keystore);
+            keystore,
+            amountLimit
+        );
     },
 
-    collectData:function(_httpSession, func) {
+    collectDataInternal:function(_httpSession, func) {
 
         var _login = this.login;
         var _uri = this.getUri();
@@ -38,7 +40,7 @@ const TMIProvider = new Lang.Class({
             let message =
                 Soup.form_request_new_from_hash('GET', _uri, {});
 
-            let auth = new Soup.AuthBasic()
+            let auth = new Soup.AuthBasic();
 
             auth.authenticate(_login, _password);
             message.request_headers.append("Authorization", auth.get_authorization(message))
@@ -83,5 +85,9 @@ const TMIProvider = new Lang.Class({
             return;
         };
         this.retrievePassword(callback)
+    },
+
+    convertToCents:function(amountNumber){
+        return (amountNumber*100).toFixed();
     }
 });

@@ -12,5 +12,9 @@
 }
 
 .pp-unit-label {
-	padding: 0px 2px 0px 2px;
+	padding: 0 2px 0 2px;
+}
+
+.warning {
+	color: red;
 }

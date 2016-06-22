@@ -21,6 +21,7 @@ const BaseProvider = new Lang.Class({
     link: String(),
     keystore: Object(),
     limit: Number(),
+    currencySymbol: "€",
 
     /*
      *  Initialize the instance of BaseProvider class
@@ -43,8 +44,13 @@ const BaseProvider = new Lang.Class({
         return this.collectDataInternal(
             _httpSession,
             (extract) => {
+                var extractAsCents = this.convertToCents(extract);
+                var flags = {
+                    'warning': extractAsCents < this.limit
+                };
                 func(
-                    this.convertToCents(extract)
+                    extractAsCents
+                    ,flags
                 );
             }
         );

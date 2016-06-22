@@ -47,16 +47,18 @@ const PrepaidMenuItem = new Lang.Class({
         this._label = new St.Label({ text: "-.--", style_class: 'pp-value' });
         this._box.add_child(new St.Label({ text: title, style_class: 'pp-label'}));
         this._box.add_child(this._label);
-        this._box.add_child(new St.Label({ text: "€", style_class: 'pp-unit-label'}));
+        this._box.add_child(new St.Label({ text: concrete.currencySymbol, style_class: 'pp-unit-label'}));
         this.actor.add(this._box);
     },
 
     collectData: function() {
         this.concrete.collectData(
             this._httpSession,
-            (amount) => {
-                // log("got amount "+amount);
+            (amount,flags) => {
                 this._label.text = Number(amount/100).toFixed(2);
+                if (flags.warning) {
+                    this._box.style_class = 'pp-box-layout warning';
+                }
             }
         );
     },

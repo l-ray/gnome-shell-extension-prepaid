@@ -22,8 +22,8 @@ const Util = imports.misc.util;
 
 const SETTINGS_SCHEMA ='de.l-ray.gnome.shell.extensions.prepaid-balances'
 const ACCOUNTS_KEY = 'accounts';
-
-const RELOAD_INTERVAL = 600; // in seconds
+const DEFAULT_REFRESH_INTERVAL = 600; // in seconds
+const REFRESH_INTERVAL_KEY = 'refresh-interval-current';
 
 let panelItemLabel;
 
@@ -124,7 +124,7 @@ const PrepaidMenu = new Lang.Class({
 
         this._reloadButton = this.createButton('view-refresh-symbolic', "Reload Account Balances Information");
         this._reloadButton.connect('clicked', Lang.bind(this, function() {
-            this.reload(RELOAD_INTERVAL);
+            this.reload(this._refreshInterval);
         }));
         this._buttonBox1.add_actor(this._reloadButton);
 
@@ -143,7 +143,7 @@ const PrepaidMenu = new Lang.Class({
         /* adding buttons on bottom of window - END */
 
         this.buildBalances();
-        this.reload(RELOAD_INTERVAL);
+        this.reload(this._refreshInterval);
 
     },
 
@@ -158,7 +158,7 @@ const PrepaidMenu = new Lang.Class({
         this._settingsC = this._settings.connect("changed", Lang.bind(this, function() {
             log("detected that schema was changed!");
             this.buildBalances();
-            this.reload(RELOAD_INTERVAL);
+            this.reload(this._refreshInterval);
         }));
     },
 
@@ -181,12 +181,19 @@ const PrepaidMenu = new Lang.Class({
         return accountKeys !== undefined && accountKeys.length > 0 ? accountKeys.split(","):[];
     },
 
+    get _refreshInterval() {
+        if (!this._settings)
+            this.loadConfig();
+        var interval = this._settings.get_int(REFRESH_INTERVAL_KEY);
+	    return interval !== undefined && interval > 0 ? Number(interval) : DEFAULT_REFRESH_INTERVAL;
+    },
+
     get _menuItems() {
         if (this._menuItemsInternal === undefined) {
             try {
             this._menuItemsInternal = this._accounts.map(
                 function(n) {
-                    var concrete = Factory.getInstance(n)
+                    var concrete = Factory.getInstance(n);
                     return new PrepaidMenuItem(concrete, _httpSession);
                 }, this)
             } catch (ex) {

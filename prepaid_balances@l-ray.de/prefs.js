@@ -10,12 +10,14 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 const Factory = Me.imports.provider.factory;
-
+const Mainloop = imports.mainloop;
 
 const EXTENSIONDIR = Me.dir.get_path();
 
 const SETTINGS_SCHEMA ='de.l-ray.gnome.shell.extensions.prepaid-balances';
 const ACCOUNTS_KEY = 'accounts';
+const REFRESH_INTERVAL_KEY = 'refresh-interval-current';
+
 
 // Keep enums in sync with GSettings schemas
 const ProviderTemplate = {
@@ -106,7 +108,23 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
 
         this.Window.get_object("button-edit-save").connect("clicked", Lang.bind(this, this.editSave));
 
-    	/* Account Name */
+        this.current_spin = this.Window.get_object("spin-current-refresh");
+        this.current_spin.set_value(this.refresh_interval_current / 60);
+
+        // prevent from continously updating the value
+        this.currentSpinTimeout = undefined;
+        this.current_spin.connect("value-changed", Lang.bind(this, function(button) {
+
+            if (this.currentSpinTimeout !== undefined)
+                Mainloop.source_remove(this.currentSpinTimeout);
+            this.currentSpinTimeout = Mainloop.timeout_add(250, Lang.bind(this, function() {
+                this.refresh_interval_current = 60 * button.get_value();
+                return false;
+            }));
+
+        }));
+
+        /* Account Name */
         let column = new Gtk.TreeViewColumn();
         column.set_title(_("Account"));
         this.treeview.append_column(column);
@@ -441,7 +459,21 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
         if (!this.Settings)
             this.loadConfig();
         this.Settings.set_string(ACCOUNTS_KEY, v);
+    },
+
+    get refresh_interval_current() {
+        if (!this.Settings)
+            this.loadConfig();
+        let v = this.Settings.get_int(REFRESH_INTERVAL_KEY);
+        return ((v >= 600) ? v : 600)
+    },
+
+    set refresh_interval_current(v) {
+        if (!this.Settings)
+            this.loadConfig();
+        this.Settings.set_int(REFRESH_INTERVAL_KEY, ((v >= 600) ? v : 600));
     }
+
 });
 
 function init() {

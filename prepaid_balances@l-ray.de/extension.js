@@ -58,6 +58,7 @@ const PrepaidMenuItem = new Lang.Class({
                 this._label.text = Number(amount/100).toFixed(2);
                 if (flags.warning) {
                     this._box.style_class = 'pp-box-layout warning';
+                    _indicator.markForWarning();
                 }
             }
         );
@@ -77,7 +78,7 @@ const PrepaidMenuItem = new Lang.Class({
     activate: function(event) {
         this.concrete.launchBalanceManagement();
         this._getTopMenu().actor.hide();
-    },
+    }
 
 });
 
@@ -238,12 +239,16 @@ const PrepaidMenu = new Lang.Class({
             /*if (this._connected && !this._idle)
                 this.currentWeatherCache = undefined; */
             _menuItems.forEach((n) => n.collectData());
+            this.markForWarning(false);
             return true;
         }));
         this._menuItems.forEach((n) => n.collectData());
+        this.markForWarning(false);
     },
 
-
+    markForWarning: function(status = true) {
+        panelItemLabel.style_class = status ? 'warning' : '';
+    }
 
 });
 

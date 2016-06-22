@@ -1,6 +1,6 @@
 {
   "name": "Pre-Paid Balances",
-  "description": "Collects and shows the current balance on prepaid accounts like mobile phones.",
+  "description": "Collects and shows the current balance on prepaid accounts like mobile phones. Currently provides Sipgate, Tesco Mobile IE, LeapCard.",
   "shell-version": [
     "3.14",
     "3.16",
@@ -10,5 +10,5 @@
   ],
   "url": "http://github.com/l-ray/gnome-shell-extension-prepaid/",
   "uuid": "prepaid_balances@l-ray.de",
-  "version": 3
+  "version": 4
 }

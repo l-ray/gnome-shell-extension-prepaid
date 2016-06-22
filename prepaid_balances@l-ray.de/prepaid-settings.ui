@@ -197,7 +197,7 @@
             <property name="can_focus">False</property>
             <property name="halign">start</property>
             <property name="hexpand">True</property>
-            <property name="label" translatable="yes">Edit Warning amount</property>
+            <property name="label" translatable="yes">Edit Warning amount (in cents)</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -249,7 +249,7 @@
       <!-- column-name login -->
       <column type="gchararray"/>
       <!-- column-name warning amount -->
-      <column type="gint"/>
+      <column type="gchararray"/>
     </columns>
     <data>
       <row>

@@ -142,7 +142,7 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
 
     	/* warning amount */
 	    column = new Gtk.TreeViewColumn();
-        column.set_title(_("Warning amount in cent"));
+        column.set_title(_("Warning amount"));
         this.treeview.append_column(column);
 
         column.pack_start(renderer, null);
@@ -234,7 +234,7 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
                     this.liststore.set_value(current, 0, account[i].label);
                     this.liststore.set_value(current, 1, account[i].instanceName);
                     this.liststore.set_value(current, 2, account[i].login);
-                    this.liststore.set_value(current, 3, account[i].amountLimit);
+                    this.liststore.set_value(current, 3, Number(account[i].amountLimit/100).toFixed(2));
                 }
             }
 

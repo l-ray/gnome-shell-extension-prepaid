@@ -12,7 +12,6 @@ const BaseProvider = new Lang.Class({
 
     Name: 'BaseProvider',
     title: 'title',
-    httpLink: 'http://test.de',
     protocol: String(),
     server: String(),
     port: String(),
@@ -27,13 +26,8 @@ const BaseProvider = new Lang.Class({
      *  Initialize the instance of BaseProvider class
      *  root - root element of feed file
      */
-    _init: function(title,protocol,server,port,theObject,link,login,keystore,limit) {
+    _init: function(title,login,keystore,limit) {
         this.title=title;
-        this.protocol=protocol;
-        this.server=server;
-        this.port=port;
-        this.theObject=theObject;
-        this.link = link;
         this.login=login;
         log("base provider keystore:"+keystore);
         this.keystore = keystore;

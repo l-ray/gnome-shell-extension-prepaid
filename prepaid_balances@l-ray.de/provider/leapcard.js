@@ -21,6 +21,12 @@ const LeapCardProvider = new Lang.Class({
     Name: 'LeapCardProvider',
     Extends: Base.BaseProvider,
 
+    protocol : "https",
+    server : "www.leapcard.ie",
+    port : "443",
+    theObject : "/en/login.aspx",
+    link : "/en/login.aspx",
+
     /*
      *  Initialize the instance of LeapCardProvider class
      *  root - root element of feed file
@@ -28,11 +34,6 @@ const LeapCardProvider = new Lang.Class({
     _init: function(login,keystore, label, amountLimit) {
         this.parent(
             label,
-            "https",
-            "www.leapcard.ie",
-            "443",
-            "/en/login.aspx",
-            "/en/login.aspx",
             login,
             keystore,
             amountLimit

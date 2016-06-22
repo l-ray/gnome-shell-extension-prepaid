@@ -12,6 +12,13 @@ const SipgateProvider = new Lang.Class({
     Name: 'SipgateProvider',
     Extends: Base.BaseProvider,
 
+    protocol : "https",
+    server : "api.sipgate.net",
+    port : "443",
+    theObject : "/RPC2",
+    link : "https://www.sipgate.de/basic/dashboard",
+
+
     /*
      *  Initialize the instance of SipgateProvider class
      *  root - root element of feed file
@@ -19,11 +26,6 @@ const SipgateProvider = new Lang.Class({
     _init: function(login,keystore,label,amountLimit) {
         this.parent(
             label,
-            "https",
-            "api.sipgate.net",
-            "443",
-            "/RPC2",
-            "https://www.sipgate.de/basic/dashboard",
             login,
             keystore,
             amountLimit

@@ -12,6 +12,12 @@ const TMIProvider = new Lang.Class({
     Name: 'TescoMobileIrelandProvider',
     Extends: Base.BaseProvider,
 
+    protocol : "https",
+    server : "my.tescomobile.ie",
+    port : "443",
+    theObject : "/tmi-selfcare-web/rest/customer/balance",
+    link : "/tmi-selfcare-web/login",
+
     /*
      *  Initialize the instance of SipgateProvider class
      *  root - root element of feed file
@@ -20,11 +26,6 @@ const TMIProvider = new Lang.Class({
         log("TMI keystore:"+keystore);
         this.parent(
             label,
-            "https",
-            "my.tescomobile.ie",
-            "443",
-            "/tmi-selfcare-web/rest/customer/balance",
-            "/tmi-selfcare-web/login",
             login,
             keystore,
             amountLimit

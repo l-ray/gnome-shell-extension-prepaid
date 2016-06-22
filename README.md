@@ -9,6 +9,7 @@ This is a simple Gnome shell extension for displaying your current prepaid balan
  1. copy the directory `prepaid_balances@l-ray.de` to `$HOME/.local/share/gnome-shell/extensions/`
  1. activate extension using [Gnome Tweak Tool](wiki.gnome.org/action/show/Apps/GnomeTweakTool)
 
+Alternatively load extension from the [Gnome Extensions](https://extensions.gnome.org/extension/1053/pre-paid-balances/) web page.
 ## Supports:
  * Sipgate (incl. Simquadrat)
  * Tesco Mobile Ireland

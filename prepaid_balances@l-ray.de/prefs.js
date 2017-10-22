@@ -272,7 +272,7 @@ const PrepaidOverviewPrefsWidget = new GObject.Class({
     configWidgets: [],
 
     selectionChanged: function(select) {
-        let a = select.get_selected_rows(this.liststore)[0][0];
+        let a = select.get_selected_rows()[0][0];
         if (a !== undefined)
             if (this.actual_account != parseInt(a.to_string()))
                 this.actual_account = parseInt(a.to_string());

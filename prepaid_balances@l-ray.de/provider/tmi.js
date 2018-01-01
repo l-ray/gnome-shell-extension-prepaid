@@ -2,15 +2,14 @@
 const Lang = imports.lang;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
-const Base = Me.imports.provider.base;
+const Phone = Me.imports.provider.phone;
 const Soup = imports.gi.Soup;
 // const Log = Me.imports.logger;
-
 
 const TMIProvider = new Lang.Class({
 
     Name: 'TescoMobileIrelandProvider',
-    Extends: Base.BaseProvider,
+    Extends: Phone.PhoneProvider,
 
     protocol : "https",
     server : "my.tescomobile.ie",
@@ -63,7 +62,7 @@ const TMIProvider = new Lang.Class({
 
                     var result = message.response_body.data;
                     //log(message.response_body.data)
-                    func(jp.mainBalance);
+                    func({money:jp.mainBalance});
 
                 } catch (e) {
                     log("Exception " + e);

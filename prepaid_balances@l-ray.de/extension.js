@@ -8,6 +8,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 const Factory = Me.imports.provider.factory;
+const UIFactory = Me.imports.ui.factory;
 
 const Soup = imports.gi.Soup;
 
@@ -17,6 +18,8 @@ const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const Panel = imports.ui.panel;
 
+const PrepaidMenuItem = Me.imports.ui.baseitem;
+
 const Util = imports.misc.util;
 
 const SETTINGS_SCHEMA ='de.l-ray.gnome.shell.extensions.prepaid-balances'
@@ -25,61 +28,6 @@ const DEFAULT_REFRESH_INTERVAL = 600; // in seconds
 const REFRESH_INTERVAL_KEY = 'refresh-interval-current';
 
 let panelItemLabel;
-
-const PrepaidMenuItem = new Lang.Class({
-    Name: 'PrepaidMenuItem',
-    reactive: false,
-    Extends: PopupMenu.PopupBaseMenuItem,
-    concrete: Object(),
-    _httpSession: Object(),
-
-    _init: function(concrete, _httpSession) {
-        this.parent();
-
-        this.concrete = concrete;
-        this._httpSession = _httpSession;
-        // var title = "dummy";
-        var title = concrete.title;
-
-        // this.actor.add_child(this._icon);
-        this._box = new St.BoxLayout({style_class: 'pp-box-layout'});
-        this._label = new St.Label({ text: "-.--", style_class: 'pp-value' });
-        this._box.add_child(new St.Label({ text: title, style_class: 'pp-label'}));
-        this._box.add_child(this._label);
-        this._box.add_child(new St.Label({ text: concrete.currencySymbol, style_class: 'pp-unit-label'}));
-        this.actor.add(this._box);
-    },
-
-    collectData: function() {
-        this.concrete.collectData(
-            this._httpSession,
-            (amount,flags) => {
-                this._label.text = Number(amount/100).toFixed(2);
-                if (flags.warning) {
-                    this._box.style_class = 'pp-box-layout warning';
-                    _indicator.markForWarning();
-                }
-            }
-        );
-    },
-
-    destroy: function() {
-        if (this.concrete) {
-            this.concrete.destroy();
-        }
-        if (this._changedId) {
-             this._changedId = 0;
-        }
-
-        this.parent();
-    },
-
-    activate: function(event) {
-        this.concrete.launchBalanceManagement();
-        this._getTopMenu().actor.hide();
-    }
-
-});
 
 const PrepaidMenu = new Lang.Class({
     Name: 'PrepaidMenu.PrepaidMenu',
@@ -193,7 +141,8 @@ const PrepaidMenu = new Lang.Class({
             this._menuItemsInternal = this._accounts.map(
                 function(n) {
                     var concrete = Factory.getInstance(n);
-                    return new PrepaidMenuItem(concrete, _httpSession);
+                    log("Calling UI factory");
+                    return UIFactory.getInstance(concrete, _httpSession);
                 }, this)
             } catch (ex) {
                 log("parsing error creating menu items:"+ex);
@@ -204,7 +153,7 @@ const PrepaidMenu = new Lang.Class({
     },
 
     set _menuItems(val) {
-        this._menuItemsInternal = val
+        this._menuItemsInternal = val;
         return this._menuItemsInternal;
     },
 
@@ -255,7 +204,6 @@ const PrepaidMenu = new Lang.Class({
     markForWarning: function(status = true) {
         panelItemLabel.style_class = status ? 'warning' : '';
     }
-
 });
 
 
@@ -263,7 +211,6 @@ let _httpSession;
 
 
 function init() {
-    
 }
 
 let _indicator;
@@ -283,5 +230,3 @@ function disable() {
     _indicator.destroy();
     _indicator = undefined;
 }
-
-

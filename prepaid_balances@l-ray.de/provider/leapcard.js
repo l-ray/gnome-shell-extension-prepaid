@@ -1,6 +1,7 @@
 const Lang = imports.lang;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
+const Transport = Me.imports.provider.transport;
 const Base = Me.imports.provider.base;
 const Soup = imports.gi.Soup;
 
@@ -19,7 +20,7 @@ function extractBalance(payload) {
 const LeapCardProvider = new Lang.Class({
 
     Name: 'LeapCardProvider',
-    Extends: Base.BaseProvider,
+    Extends: Transport.TransportProvider,
 
     protocol : "https",
     server : "www.leapcard.ie",

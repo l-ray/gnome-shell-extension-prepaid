@@ -1,7 +1,7 @@
 const Lang = imports.lang;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
-const Base = Me.imports.provider.base;
+const Phone = Me.imports.provider.phone;
 const Soup = imports.gi.Soup;
 const GLib = imports.gi.GLib;
 // const Log = Me.imports.logger;
@@ -10,7 +10,7 @@ const GLib = imports.gi.GLib;
 const SipgateProvider = new Lang.Class({
 
     Name: 'SipgateProvider',
-    Extends: Base.BaseProvider,
+    Extends: Phone.PhoneProvider,
 
     protocol : "https",
     server : "api.sipgate.net",
@@ -60,7 +60,11 @@ const SipgateProvider = new Lang.Class({
                     var result = message.response_body.data
                     // log(message.response_body.data)
                     func(
-                        /TotalIncludingVat<\/name><value><double>([0-9]+\.[0-9]{1,2})/.exec(result)[1]
+                        {
+                            money: /TotalIncludingVat<\/name><value><double>([0-9]+\.[0-9]{1,2})/.exec(result)[1],
+                            data: "bla",
+                            time: "blub"
+                        }
                     );
 
                 } catch (e) {

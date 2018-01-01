@@ -1,5 +1,5 @@
 .pp-box-layout {
-	width: 200px;
+	width: 400px;
 }
 .pp-label {
 	/*text-align: right;*/
@@ -7,7 +7,7 @@
 }
 
 .pp-value {
-	text-align: right;
+	/*text-align: right;*/
 	width:40px;
 }
 

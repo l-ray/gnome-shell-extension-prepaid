@@ -35,19 +35,8 @@ const BaseProvider = new Lang.Class({
     },
 
     collectData: function(_httpSession, func) {
-        return this.collectDataInternal(
-            _httpSession,
-            (extract) => {
-                var extractAsCents = this.convertToCents(extract);
-                var flags = {
-                    'warning': extractAsCents < this.limit
-                };
-                func(
-                    extractAsCents
-                    ,flags
-                );
-            }
-        );
+        // child classes implements this 'abstract' function
+        throw "Not implemented by concrete class."
     },
 
     /*

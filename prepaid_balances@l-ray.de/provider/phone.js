@@ -13,12 +13,13 @@ const PhoneProvider = new Lang.Class({
     Extends: Base.BaseProvider,
     timeSymbol: "min",
     capacitySymbol: "MB",
+    smsSymbol: "SMS",
 
     collectData: function(_httpSession, func) {
         return this.collectDataInternal(
             _httpSession,
             (amounts) => {
-                var extractAsCents = this.convertToCents(amounts.money);
+                var extractAsCents = amounts.money ? this.convertToCents(amounts.money) : undefined;
                 var flags = {
                     'warning': extractAsCents < this.limit
                 };
@@ -26,12 +27,12 @@ const PhoneProvider = new Lang.Class({
                     {
                         money : extractAsCents,
                         data : amounts.data,
-                        time : amounts.time
+                        time : amounts.time,
+                        sms: amounts.sms
                     },
                     flags
                 );
             }
         );
-    },
-
+    }
 });
